@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SITS PTO Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1a2f4a;--blue:#1e4d8c;--mid:#2d6abf;--light:#4a90d9;--accent:#5bbfdf;
+  --bg:#f0f5fb;--card:#ffffff;--text:#1a2035;--muted:#6b7a99;--border:#dbe6f5;
+  --radius:12px;--shadow:0 2px 12px rgba(30,77,140,0.08);
+  --green:#0d7a4e;--green-bg:#e6f7f0;--green-b:#b7e8d4;
+  --red:#c0392b;--red-bg:#fdecea;--red-b:#f5c6c2;
+  --yellow:#8a5a00;--yellow-bg:#fff8e6;--yellow-b:#ffd97a;
+  --orange:#9a4500;--orange-bg:#fff0e6;--orange-b:#ffbe8a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.page{display:none;min-height:100vh;padding:24px;}
+.page.active{display:flex;flex-direction:column;align-items:center;}
+.wrap{width:100%;max-width:760px;}
+.wrap-sm{width:100%;max-width:460px;}
+.hdr{background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:var(--radius);padding:22px 28px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(26,47,74,0.25);}
+.hdr h1{color:#fff;font-size:17px;font-weight:700;}
+.hdr p{color:var(--accent);font-size:12px;margin-top:3px;}
+#pg-landing{justify-content:center;background:linear-gradient(160deg,#e8f0fb,#f5f8ff,#eaf4fb);}
+.lcard{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(30,77,140,0.15);width:100%;max-width:440px;}
+.lhero{background:linear-gradient(135deg,var(--navy),var(--blue) 60%,var(--mid));padding:40px 32px;text-align:center;}
+.llogo{width:64px;height:64px;background:rgba(255,255,255,0.12);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;border:1px solid rgba(255,255,255,0.2);}
+.lhero h1{color:#fff;font-size:22px;font-weight:700;}
+.lhero p{color:var(--accent);font-size:13px;margin-top:6px;}
+.lbody{padding:28px 32px 32px;}
+.lbody>p{color:var(--muted);font-size:13px;text-align:center;margin-bottom:20px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.btn-p{background:var(--blue);color:#fff;}.btn-p:hover{background:var(--navy);transform:translateY(-1px);}
+.btn-s{background:var(--mid);color:#fff;}.btn-s:hover{background:var(--blue);}
+.btn-g{background:var(--bg);color:var(--muted);border:1px solid var(--border);}.btn-g:hover{background:var(--border);}
+.btn-d{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}.btn-d:hover{background:#f9d5d2;}
+.btn-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:7px;}
+.btn-full{width:100%;}
+.btn-back{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:1px solid rgba(255,255,255,0.2);font-size:12px;padding:6px 14px;}
+.btn-back:hover{background:rgba(255,255,255,0.22);color:#fff;}
+.card{background:var(--card);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.ctitle{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+label.lbl{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;}
+input,select{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color 0.15s;}
+input:focus,select:focus{border-color:var(--light);box-shadow:0 0 0 3px rgba(74,144,217,0.12);}
+.fg{margin-bottom:14px;}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.fg4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:14px;}
+.fg5{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:14px;}
+.tabs{display:flex;gap:4px;background:var(--card);border-radius:10px;padding:4px;margin-bottom:20px;box-shadow:var(--shadow);border:1px solid var(--border);flex-wrap:wrap;}
+.tab{flex:1;min-width:70px;padding:8px 4px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all 0.15s;}
+.tab.active{background:var(--blue);color:#fff;}
+.tc{display:none;}.tc.active{display:block;}
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);background:var(--bg);}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafcff;}
+tfoot tr td{background:var(--bg)!important;font-weight:700;font-size:12px;color:var(--navy);}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.bg{background:var(--green-bg);color:var(--green);}
+.br{background:var(--red-bg);color:var(--red);}
+.by{background:var(--yellow-bg);color:var(--yellow);}
+.bb{background:#e8f0fb;color:var(--blue);}
+.bo{background:var(--orange-bg);color:var(--orange);}
+.sg{display:grid;gap:12px;margin-bottom:16px;}
+.sg2{grid-template-columns:1fr 1fr;}
+.sg3{grid-template-columns:1fr 1fr 1fr;}
+.sc{background:var(--card);border-radius:10px;padding:16px 18px;border:1px solid var(--border);box-shadow:var(--shadow);text-align:center;}
+.sv{font-size:26px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;}
+.sl{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.hi{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:9px;margin-bottom:8px;border:1px solid transparent;}
+.hi.acc{background:var(--green-bg);border-color:var(--green-b);}
+.hi.used{background:var(--red-bg);border-color:var(--red-b);}
+.hi.pend{background:var(--yellow-bg);border-color:var(--yellow-b);}
+.hi.roll{background:#e8f0fb;border-color:#c5d9f5;}
+.hi.deny{background:#f5f5f5;border-color:#ddd;}
+.hm{font-size:13px;font-weight:600;}
+.hs{font-size:11px;color:var(--muted);margin-top:2px;}
+.hh{font-size:14px;font-weight:700;font-family:'DM Mono',monospace;}
+.hh.pos{color:var(--green);}.hh.neg{color:var(--red);}.hh.neu{color:var(--blue);}
+.al{padding:11px 15px;border-radius:9px;font-size:13px;margin-bottom:14px;font-weight:500;border:1px solid transparent;}
+.al-g{background:var(--green-bg);color:var(--green);border-color:var(--green-b);}
+.al-r{background:var(--red-bg);color:var(--red);border-color:var(--red-b);}
+.al-y{background:var(--yellow-bg);color:var(--yellow);border-color:var(--yellow-b);}
+.al-b{background:#e8f0fb;color:var(--blue);border-color:#c5d9f5;}
+.al-o{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-b);}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 0;}
+.hint{color:var(--muted);font-size:11px;margin-top:5px;}
+.err{color:var(--red);font-size:12px;margin-top:6px;font-weight:500;}
+hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.mono{font-family:'DM Mono',monospace;}
+.ep{background:linear-gradient(135deg,#e8f2fb,#f5faff);border-radius:10px;padding:20px;border:1px solid var(--border);margin-bottom:16px;}
+.en{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:14px;}
+.ri{font-size:12px;color:var(--muted);padding:8px 12px;background:var(--bg);border-radius:7px;margin-top:8px;}
+.er{padding:14px 16px;border-radius:10px;margin-top:14px;}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--light);background:#e8f0fb;}
+.upload-zone input[type=file]{display:none;}
+.upload-icon{font-size:32px;margin-bottom:8px;}
+.upload-title{font-size:15px;font-weight:600;color:var(--navy);}
+.upload-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="pg-landing" class="page active">
+  <div class="lcard">
+    <div class="lhero">
+      <div class="llogo">📋</div>
+      <h1>SITS PTO Tracker</h1>
+      <p>Steelcase Integrated Talent Solutions</p>
+    </div>
+    <div class="lbody">
+      <p>Select your role to continue</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-p btn-full" style="padding:13px;font-size:15px" id="go-admin-login">🔐 &nbsp;Admin Login</button>
+        <button class="btn btn-s btn-full" style="padding:13px;font-size:15px" id="go-emp-login">👤 &nbsp;Employee Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="pg-adminlogin" class="page">
+  <div class="wrap-sm">
+    <div class="hdr"><div><h1>Admin Login</h1><p>SITS PTO Tracker</p></div></div>
+    <div class="card">
+      <div class="fg"><label class="lbl">Password</label>
+        <input type="password" id="adminPwIn" placeholder="Enter admin password">
+      </div>
+      <div id="adminLoginErr" class="err" style="display:none"></div>
+      <div class="fg2" style="margin-top:4px">
+        <button class="btn btn-p" id="do-admin-login">Login</button>
+        <button class="btn btn-g" id="admin-back">← Back</button>
+      </div>
+      <p class="hint" style="margin-top:10px;text-align:center">Default password: <strong>sits2026</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEE LOGIN -->
+<div id="pg-emplogin" class="page">
+  <div class="wrap-sm">
+    <div class="hdr"><div><h1>Employee Login</h1><p>SITS PTO Tracker</p></div></div>
+    <div class="card">
+      <div class="fg"><label class="lbl">Your Name</label>
+        <select id="empLoginSel"></select>
+      </div>
+      <div class="fg"><label class="lbl">Password</label>
+        <input type="password" id="empLoginPw" placeholder="Enter your password">
+      </div>
+      <div id="empLoginErr" class="err" style="display:none"></div>
+      <div class="fg2" style="margin-top:4px">
+        <button class="btn btn-s" id="do-emp-login">Login</button>
+        <button class="btn btn-g" id="emp-back">← Back</button>
+      </div>
+      <p class="hint" style="margin-top:10px;text-align:center">Forgot your password? Contact <strong>sits@steelcase.com</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEE DASHBOARD -->
+<div id="pg-empdash" class="page">
+  <div class="wrap">
+    <div class="hdr">
+      <div><h1 id="empDashTitle">My PTO</h1><p>Steelcase Integrated Talent Solutions</p></div>
+      <button class="btn btn-back" id="emp-logout">← Logout</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="et-bal">💰 My Balance</button>
+      <button class="tab" data-tab="et-req">📅 Request PTO</button>
+      <button class="tab" data-tab="et-hist">📋 History</button>
+      <button class="tab" data-tab="et-acct">🔐 My Account</button>
+    </div>
+    <div id="et-bal" class="tc active">
+      <div class="ep">
+        <div class="en" id="empProfileName"></div>
+        <div class="sg sg3">
+          <div class="sc"><div class="sv" id="empStatBal">0.00</div><div class="sl">Available PTO (hrs)</div></div>
+          <div class="sc"><div class="sv" id="empStatHrs">0</div><div class="sl">Hours Worked</div></div>
+          <div class="sc"><div class="sv">72</div><div class="sl">Rollover Cap (hrs)</div></div>
+        </div>
+        <div class="ri" id="empRolloverInfo"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">📊 Pending Requests</div>
+        <div id="empPendList"><div class="empty">No pending requests.</div></div>
+      </div>
+    </div>
+    <div id="et-req" class="tc">
+      <div class="card">
+        <div class="ctitle">📅 Submit a PTO Request</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Requests are auto-approved if your projected balance is sufficient on the requested date.</p>
+        <div class="fg2">
+          <div><label class="lbl">Start Date</label><input type="date" id="reqStart"></div>
+          <div><label class="lbl">End Date</label><input type="date" id="reqEnd"></div>
+        </div>
+        <div class="fg"><label class="lbl">Hours to Request</label><input type="number" id="reqHrs" placeholder="e.g. 8 (full day), 4 (half day)" min="0.5" step="0.5"></div>
+        <div class="fg"><label class="lbl">Note (optional)</label><input type="text" id="reqNote" placeholder="e.g. Vacation, personal day..."></div>
+        <div id="reqPreview" style="display:none" class="er"></div>
+        <button class="btn btn-s btn-full" style="margin-top:8px" id="submit-pto-req">Submit Request</button>
+      </div>
+      <div class="card">
+        <div class="ctitle">🔮 Balance Estimator</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:14px">See your projected PTO balance on any future date.</p>
+        <div class="fg2">
+          <div><label class="lbl">Future Date</label><input type="date" id="estDate"></div>
+          <div><label class="lbl">Hours to Deduct (optional)</label><input type="number" id="estHrs" placeholder="0" min="0" step="0.5"></div>
+        </div>
+        <button class="btn btn-p" id="run-estimator">Calculate</button>
+        <div id="estOutput" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+    <div id="et-hist" class="tc">
+      <div class="card">
+        <div class="ctitle">📋 Full History</div>
+        <div id="empFullHist"><div class="empty">No history yet.</div></div>
+      </div>
+    </div>
+    <div id="et-acct" class="tc">
+      <div class="card">
+        <div class="ctitle">🔐 Change My Password</div>
+        <div class="fg"><label class="lbl">Current Password</label><input type="password" id="empCurPw" placeholder="Current password"></div>
+        <div class="fg2">
+          <div><label class="lbl">New Password</label><input type="password" id="empNewPw" placeholder="New password"></div>
+          <div><label class="lbl">Confirm</label><input type="password" id="empConfPw" placeholder="Confirm new password"></div>
+        </div>
+        <div id="empPwMsg" style="display:none"></div>
+        <button class="btn btn-p" style="margin-top:8px" id="change-emp-pw">Update Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="pg-admin" class="page">
+  <div class="wrap">
+    <div class="hdr">
+      <div><h1>Admin Dashboard</h1><p id="adminSub">SITS PTO Tracker</p></div>
+      <button class="btn btn-back" id="admin-exit">← Exit</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="at-emp">👥 Employees</button>
+      <button class="tab" data-tab="at-upload">📤 Upload Hours</button>
+      <button class="tab" data-tab="at-manual">⏱️ Manual Hours</button>
+      <button class="tab" data-tab="at-pto">🏖️ Log PTO</button>
+      <button class="tab" data-tab="at-roll">🔄 Rollover</button>
+      <button class="tab" data-tab="at-set">⚙️ Settings</button>
+    </div>
+
+    <!-- EMPLOYEES -->
+    <div id="at-emp" class="tc active">
+      <div class="card">
+        <div class="ctitle">➕ Add New Employee</div>
+        <div class="fg5">
+          <div><label class="lbl">Full Name (First Last)</label><input type="text" id="newName" placeholder="e.g. Andrew Meldrim"></div>
+          <div><label class="lbl">Anniversary Date</label><input type="date" id="newAnniv"></div>
+          <div><label class="lbl">Default Weekly Hrs</label><input type="number" id="newDefHrs" placeholder="e.g. 50 or leave blank" min="0" max="168"></div>
+          <div><label class="lbl">Starting PTO Balance</label><input type="number" id="newBal" placeholder="0" min="0" step="0.01"></div>
+          <div><label class="lbl">Password</label><input type="password" id="newPw" placeholder="Set password"></div>
+          <div style="display:flex;align-items:flex-end"><button class="btn btn-p" style="white-space:nowrap" id="add-emp">Add</button></div>
+        </div>
+        <p class="hint">Default Weekly Hours: employees with this set will auto-accrue when you run a weekly upload, even if not in the timesheet file.</p>
+      </div>
+      <div class="card">
+        <div class="ctitle">👥 All Employees (<span id="empCount">0</span>)</div>
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Name</th><th>Anniversary</th><th>Default Hrs/Wk</th><th>Hours Worked</th><th>PTO Balance</th><th>Next Rollover</th><th></th></tr></thead>
+            <tbody id="empTbl"><tr><td colspan="7" class="empty">No employees yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD HOURS -->
+    <div id="at-upload" class="tc">
+      <div class="card">
+        <div class="ctitle">📤 Upload VectorVMS Timesheet</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Upload the Timesheet Summary XML file exported from VectorVMS. Hours will be matched to employees by name and PTO will accrue automatically. Employees with default weekly hours set will also be processed.</p>
+        <div class="al al-b" style="margin-bottom:16px">ℹ️ Names are matched automatically. VectorVMS uses "Last, First" format — the tracker will flip these to match "First Last" in your employee list.</div>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="xmlFileIn" accept=".xml">
+          <div class="upload-icon">📁</div>
+          <div class="upload-title">Click to select or drag and drop your XML file</div>
+          <div class="upload-sub">Timesheet_Summary.xml from VectorVMS</div>
+        </div>
+        <div id="uploadPreview" style="display:none;margin-top:16px"></div>
+        <div id="uploadActions" style="display:none;margin-top:12px">
+          <button class="btn btn-p btn-full" id="confirm-upload">✅ Confirm & Process All Hours</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANUAL HOURS -->
+    <div id="at-manual" class="tc">
+      <div class="card">
+        <div class="ctitle">⏱️ Log Hours Manually</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Enter hours worked for a specific week ending date. PTO accrues at <span id="rateDisp">0.0385</span> hrs per hr worked.</p>
+        <div class="fg3">
+          <div><label class="lbl">Employee</label><select id="manEmp"></select></div>
+          <div><label class="lbl">Week Ending Date</label><input type="date" id="manWeekEnd"></div>
+          <div><label class="lbl">Hours Worked</label><input type="number" id="manHrs" placeholder="e.g. 40" min="0" max="168"></div>
+        </div>
+        <div id="manPreview" style="display:none" class="al al-g"></div>
+        <div id="manDupWarn" style="display:none" class="al al-y"></div>
+        <button class="btn btn-p btn-full" id="log-manual">Log Hours & Accrue PTO</button>
+      </div>
+      <div class="card">
+        <div class="ctitle">📋 Weekly Log — <span id="weekLogName" style="color:var(--mid);font-weight:400">Select employee above</span></div>
+        <div id="weekLog"><div class="empty">Select an employee to view their weekly hours log.</div></div>
+      </div>
+    </div>
+
+    <!-- LOG PTO -->
+    <div id="at-pto" class="tc">
+      <div class="card">
+        <div class="ctitle">🏖️ Log PTO (Admin Override)</div>
+        <div class="fg"><label class="lbl">Employee</label><select id="ptoEmp"></select></div>
+        <div class="fg3">
+          <div><label class="lbl">Hours</label><input type="number" id="ptoHrs" placeholder="e.g. 8" min="0" step="0.5"></div>
+          <div><label class="lbl">Date</label><input type="date" id="ptoDt"></div>
+          <div><label class="lbl">Status</label>
+            <select id="ptoStat"><option value="Approved">Approved</option><option value="Pending">Pending</option><option value="Denied">Denied</option></select>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">Note</label><input type="text" id="ptoNote" placeholder="Reason or description..."></div>
+        <button class="btn btn-s btn-full" id="log-pto">Log PTO</button>
+      </div>
+      <div class="card">
+        <div class="ctitle">📋 Pending Employee Requests</div>
+        <div id="adminPendList"><div class="empty">No pending requests.</div></div>
+      </div>
+    </div>
+
+    <!-- ROLLOVER -->
+    <div id="at-roll" class="tc">
+      <div class="card">
+        <div class="ctitle">🔄 Process Annual Rollover</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Run rollover on an employee's anniversary date. Balance over 72 hours is forfeited; up to 72 hours carries forward.</p>
+        <div class="al al-b" style="margin-bottom:14px">ℹ️ Rollover cap: <strong>72 hours</strong>. Hours above 72 are forfeited at the anniversary date.</div>
+        <div class="fg2">
+          <div><label class="lbl">Employee</label><select id="rollEmp"></select></div>
+          <div style="display:flex;align-items:flex-end"><button class="btn btn-p btn-full" id="proc-rollover">Process Rollover</button></div>
+        </div>
+        <div id="rollMsg" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">📅 Upcoming Anniversary Dates</div>
+        <div id="upcomingRoll"><div class="empty">No employees yet.</div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="at-set" class="tc">
+      <div class="card">
+        <div class="ctitle">⚙️ Accrual Rate</div>
+        <table style="font-size:12px;margin-bottom:14px;width:100%">
+          <tr><td class="mono" style="padding:4px 0;color:var(--blue);width:80px">0.0385</td><td style="color:var(--muted)">~1 hr PTO per 26 hrs worked</td></tr>
+          <tr><td class="mono" style="padding:4px 0;color:var(--blue)">0.0577</td><td style="color:var(--muted)">~1.5 hrs per 26 hrs worked</td></tr>
+          <tr><td class="mono" style="padding:4px 0;color:var(--blue)">0.0769</td><td style="color:var(--muted)">~2 hrs per 26 hrs worked</td></tr>
+        </table>
+        <div class="fg2">
+          <div><label class="lbl">Accrual Rate</label><input type="number" id="rateIn" step="0.0001" placeholder="e.g. 0.0385"></div>
+          <div style="display:flex;align-items:flex-end"><button class="btn btn-p btn-full" id="update-rate">Update</button></div>
+        </div>
+        <div id="rateMsg" style="display:none;margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">🔐 Reset Employee Password</div>
+        <div class="fg3">
+          <div><label class="lbl">Employee</label><select id="pwEmp"></select></div>
+          <div><label class="lbl">New Password</label><input type="password" id="pwNew" placeholder="New password"></div>
+          <div style="display:flex;align-items:flex-end"><button class="btn btn-p btn-full" id="reset-pw">Reset</button></div>
+        </div>
+        <div id="pwResetMsg" style="display:none;margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">🔐 Change Admin Password</div>
+        <div class="fg2">
+          <div><label class="lbl">New Password</label><input type="password" id="adminNewPw" placeholder="New password"></div>
+          <div><label class="lbl">Confirm</label><input type="password" id="adminConfPw" placeholder="Confirm"></div>
+        </div>
+        <button class="btn btn-p" id="change-admin-pw">Update Admin Password</button>
+        <div id="adminPwMsg" style="display:none;margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">💾 Data</div>
+        <div class="fg2">
+          <button class="btn btn-s" id="export-csv">📥 Export to CSV</button>
+          <button class="btn btn-d" id="clear-data">🗑️ Clear All Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false">
+(function(){
+
+// ===== STATE =====
+var db = {employees:[],ptoRate:0.0385,adminPassword:'sits2026'};
+var curEmpId = null;
+var uploadData = null;
+
+function load(){try{var s=localStorage.getItem('sits_pto_v4');if(s)db=Object.assign({},db,JSON.parse(s));}catch(e){}}
+function save(){try{localStorage.setItem('sits_pto_v4',JSON.stringify(db));}catch(e){}}
+load();
+
+// ===== NAV =====
+function showPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  if(id==='pg-admin')refreshAdmin();
+  if(id==='pg-emplogin')refreshEmpLoginDrop();
+}
+
+// ===== TABS =====
+document.querySelectorAll('.tab').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var tabId=btn.getAttribute('data-tab');
+    var page=btn.closest('.page');
+    page.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active');});
+    page.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+    if(tabId==='at-pto')renderAdminPend();
+    if(tabId==='at-roll')renderUpcoming();
+    if(tabId==='at-manual')renderWeekLog();
+  });
+});
+
+// ===== LANDING =====
+document.getElementById('go-admin-login').addEventListener('click',function(){showPage('pg-adminlogin');});
+document.getElementById('go-emp-login').addEventListener('click',function(){showPage('pg-emplogin');});
+
+// ===== ADMIN LOGIN =====
+document.getElementById('do-admin-login').addEventListener('click',doAdminLogin);
+document.getElementById('adminPwIn').addEventListener('keydown',function(e){if(e.key==='Enter')doAdminLogin();});
+document.getElementById('admin-back').addEventListener('click',function(){showPage('pg-landing');});
+
+function doAdminLogin(){
+  var pw=document.getElementById('adminPwIn').value;
+  var err=document.getElementById('adminLoginErr');
+  if(pw===db.adminPassword){err.style.display='none';document.getElementById('adminPwIn').value='';showPage('pg-admin');}
+  else{err.style.display='block';err.textContent='Incorrect password. Please try again.';}
+}
+
+// ===== EMPLOYEE LOGIN =====
+document.getElementById('do-emp-login').addEventListener('click',doEmpLogin);
+document.getElementById('empLoginPw').addEventListener('keydown',function(e){if(e.key==='Enter')doEmpLogin();});
+document.getElementById('emp-back').addEventListener('click',function(){showPage('pg-landing');});
+document.getElementById('emp-logout').addEventListener('click',function(){curEmpId=null;showPage('pg-landing');});
+document.getElementById('admin-exit').addEventListener('click',function(){showPage('pg-landing');});
+
+function refreshEmpLoginDrop(){
+  var sel=document.getElementById('empLoginSel');
+  sel.innerHTML='<option value="">Select your name...</option>'+
+    db.employees.map(function(e){return '<option value="'+e.id+'">'+e.name+'</option>';}).join('');
+  document.getElementById('empLoginPw').value='';
+  document.getElementById('empLoginErr').style.display='none';
+}
+
+function doEmpLogin(){
+  var id=parseInt(document.getElementById('empLoginSel').value);
+  var pw=document.getElementById('empLoginPw').value;
+  var err=document.getElementById('empLoginErr');
+  var emp=db.employees.find(function(e){return e.id===id;});
+  if(!emp||pw!==emp.password){err.style.display='block';err.textContent='Incorrect name or password.';return;}
+  err.style.display='none';
+  curEmpId=id;
+  document.getElementById('empLoginPw').value='';
+  document.getElementById('empDashTitle').textContent=emp.name+"'s PTO";
+  showPage('pg-empdash');
+  refreshEmpDash();
+}
+
+// ===== EMP DASH =====
+function refreshEmpDash(){
+  var emp=db.employees.find(function(e){return e.id===curEmpId;});
+  if(!emp)return;
+  document.getElementById('empProfileName').textContent='👤 '+emp.name;
+  document.getElementById('empStatBal').textContent=emp.ptoBalance.toFixed(2);
+  document.getElementById('empStatHrs').textContent=(emp.hoursWorked||0).toFixed(0);
+  var ri=document.getElementById('empRolloverInfo');
+  if(emp.anniversaryDate){
+    var next=nextAnniv(emp.anniversaryDate);
+    var days=Math.ceil((new Date(next)-new Date())/86400000);
+    ri.textContent='🗓️ Next PTO anniversary: '+fmtDate(next)+' ('+days+' days). Up to 72 hours rolls over; any excess is forfeited.';
+  } else {ri.textContent='No anniversary date set. Contact your Engagement Manager.';}
+  var pend=(emp.requests||[]).filter(function(r){return r.status==='Pending';});
+  var pl=document.getElementById('empPendList');
+  pl.innerHTML=pend.length?pend.map(hiHTML).join(''):'<div class="empty">No pending requests.</div>';
+  var hl=document.getElementById('empFullHist');
+  var reqs=[].concat(emp.requests||[]).reverse();
+  hl.innerHTML=reqs.length?reqs.map(hiHTML).join(''):'<div class="empty">No history yet.</div>';
+}
+
+document.getElementById('submit-pto-req').addEventListener('click',submitPTOReq);
+document.getElementById('run-estimator').addEventListener('click',runEstimator);
+document.getElementById('change-emp-pw').addEventListener('click',changeEmpPw);
+
+function submitPTOReq(){
+  var emp=db.employees.find(function(e){return e.id===curEmpId;});
+  if(!emp)return;
+  var hrs=parseFloat(document.getElementById('reqHrs').value);
+  var start=document.getElementById('reqStart').value;
+  var end=document.getElementById('reqEnd').value||start;
+  var note=document.getElementById('reqNote').value.trim()||'Employee PTO request';
+  if(!hrs||hrs<=0||!start){alert('Please fill in the required fields.');return;}
+  var days=Math.max(0,Math.ceil((new Date(start+'T12:00:00')-new Date())/86400000));
+  var willAcc=parseFloat((days*8*db.ptoRate).toFixed(2));
+  var projBal=parseFloat((emp.ptoBalance+willAcc).toFixed(2));
+  var ok=projBal>=hrs;
+  var status=ok?'Approved':'Denied';
+  if(ok)emp.ptoBalance=parseFloat((emp.ptoBalance-hrs).toFixed(2));
+  emp.requests=emp.requests||[];
+  emp.requests.push({id:Date.now(),type:'PTO Used',hours:-hrs,
+    date:fmtDate(start)+(end!==start?' – '+fmtDate(end):''),note:note,status:status});
+  save();refreshEmpDash();
+  document.getElementById('reqHrs').value='';
+  document.getElementById('reqStart').value='';
+  document.getElementById('reqEnd').value='';
+  document.getElementById('reqNote').value='';
+  document.getElementById('reqPreview').style.display='none';
+  alert(ok?'✅ Your PTO request for '+hrs+' hours has been approved!':'❌ Request denied — insufficient projected balance.');
+}
+
+function runEstimator(){
+  var emp=db.employees.find(function(e){return e.id===curEmpId;});
+  if(!emp)return;
+  var dt=document.getElementById('estDate').value;
+  var extra=parseFloat(document.getElementById('estHrs').value)||0;
+  var out=document.getElementById('estOutput');
+  if(!dt){out.style.display='none';return;}
+  var days=Math.max(0,Math.ceil((new Date(dt+'T12:00:00')-new Date())/86400000));
+  var willAcc=parseFloat((days*8*db.ptoRate).toFixed(2));
+  var proj=parseFloat((emp.ptoBalance+willAcc-extra).toFixed(2));
+  out.style.display='block';
+  var cls=proj>=0?'al-g':'al-r';
+  out.innerHTML='<div class="al '+cls+'">On <strong>'+fmtDate(dt)+'</strong> ('+days+' days away):<br>'+
+    emp.ptoBalance.toFixed(2)+'h current + ~'+willAcc+'h accrual'+(extra>0?' − '+extra+'h request':'')+
+    ' = <strong>'+proj.toFixed(2)+'h projected balance</strong></div>';
+}
+
+function changeEmpPw(){
+  var emp=db.employees.find(function(e){return e.id===curEmpId;});
+  var cur=document.getElementById('empCurPw').value;
+  var np=document.getElementById('empNewPw').value;
+  var cp=document.getElementById('empConfPw').value;
+  var msg=document.getElementById('empPwMsg');
+  msg.style.display='block';
+  if(cur!==emp.password){msg.className='al al-r';msg.textContent='Current password is incorrect.';return;}
+  if(!np){msg.className='al al-r';msg.textContent='Please enter a new password.';return;}
+  if(np!==cp){msg.className='al al-r';msg.textContent='Passwords do not match.';return;}
+  emp.password=np;save();
+  document.getElementById('empCurPw').value='';document.getElementById('empNewPw').value='';document.getElementById('empConfPw').value='';
+  msg.className='al al-g';msg.textContent='✅ Password updated successfully.';
+}
+
+// ===== ADMIN =====
+function refreshAdmin(){
+  document.getElementById('adminSub').textContent=db.employees.length+' employees · Rate: '+db.ptoRate+' hrs/hr';
+  document.getElementById('empCount').textContent=db.employees.length;
+  document.getElementById('rateDisp').textContent=db.ptoRate;
+  document.getElementById('rateIn').value=db.ptoRate;
+  renderEmpTbl();refreshDrops();
+}
+
+function renderEmpTbl(){
+  var tbody=document.getElementById('empTbl');
+  if(!db.employees.length){tbody.innerHTML='<tr><td colspan="7" class="empty">No employees yet.</td></tr>';return;}
+  tbody.innerHTML=db.employees.map(function(e){
+    var next=e.anniversaryDate?nextAnniv(e.anniversaryDate):null;
+    var days=next?Math.ceil((new Date(next)-new Date())/86400000):null;
+    var rb=days!==null?'<span class="badge '+(days<=30?'bo':'bb')+'">'+fmtDate(next)+' ('+days+'d)</span>':'<span class="badge by">Not set</span>';
+    return '<tr><td style="font-weight:600">'+e.name+'</td>'+
+      '<td>'+(e.anniversaryDate?fmtDate(e.anniversaryDate):'—')+'</td>'+
+      '<td>'+(e.defaultHours?e.defaultHours+' hrs':'—')+'</td>'+
+      '<td class="mono">'+(e.hoursWorked||0).toFixed(1)+'</td>'+
+      '<td><span class="badge '+(e.ptoBalance>=0?'bg':'br')+'">'+e.ptoBalance.toFixed(2)+'h</span></td>'+
+      '<td>'+rb+'</td>'+
+      '<td><button class="btn btn-d btn-sm" onclick="removeEmp('+e.id+')">Remove</button></td></tr>';
+  }).join('');
+}
+
+function refreshDrops(){
+  var opts='<option value="">Select employee...</option>'+
+    db.employees.map(function(e){return '<option value="'+e.id+'">'+e.name+' — '+e.ptoBalance.toFixed(2)+'h</option>';}).join('');
+  ['manEmp','ptoEmp','rollEmp','pwEmp'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.innerHTML=opts;
+  });
+}
+
+// ADD EMPLOYEE
+document.getElementById('add-emp').addEventListener('click',function(){
+  var name=document.getElementById('newName').value.trim();
+  var anniv=document.getElementById('newAnniv').value;
+  var defHrs=parseFloat(document.getElementById('newDefHrs').value)||null;
+  var bal=parseFloat(document.getElementById('newBal').value)||0;
+  var pw=document.getElementById('newPw').value;
+  if(!name)return alert('Please enter a name.');
+  if(!pw)return alert('Please set a password for this employee.');
+  db.employees.push({id:Date.now(),name:name,anniversaryDate:anniv||null,defaultHours:defHrs,
+    hoursWorked:0,ptoBalance:bal,password:pw,requests:[],weeklyHours:[]});
+  save();
+  ['newName','newAnniv','newDefHrs','newBal','newPw'].forEach(function(id){document.getElementById(id).value='';});
+  refreshAdmin();
+});
+
+window.removeEmp=function(id){
+  if(!confirm('Remove this employee? This cannot be undone.'))return;
+  db.employees=db.employees.filter(function(e){return e.id!==id;});
+  save();refreshAdmin();
+};
+
+// ===== UPLOAD XML =====
+var uploadZone=document.getElementById('uploadZone');
+var fileIn=document.getElementById('xmlFileIn');
+uploadZone.addEventListener('click',function(){fileIn.click();});
+uploadZone.addEventListener('dragover',function(e){e.preventDefault();uploadZone.classList.add('drag');});
+uploadZone.addEventListener('dragleave',function(){uploadZone.classList.remove('drag');});
+uploadZone.addEventListener('drop',function(e){
+  e.preventDefault();uploadZone.classList.remove('drag');
+  var f=e.dataTransfer.files[0];if(f)processXMLFile(f);
+});
+fileIn.addEventListener('change',function(){if(fileIn.files[0])processXMLFile(fileIn.files[0]);});
+
+function processXMLFile(file){
+  var reader=new FileReader();
+  reader.onload=function(e){parseVectorXML(e.target.result);};
+  reader.readAsText(file);
+}
+
+function hmsToDecimal(hms){
+  // Convert "40:00" or "40:30" or "3:45" to decimal hours
+  var parts=hms.split(':');
+  if(parts.length<2)return parseFloat(hms)||0;
+  return parseFloat(parts[0])+(parseFloat(parts[1])/60);
+}
+
+function flipName(lastFirst){
+  // "Meldrim, Andrew" -> "Andrew Meldrim"
+  var parts=lastFirst.split(',');
+  if(parts.length<2)return lastFirst.trim();
+  return parts[1].trim()+' '+parts[0].trim();
+}
+
+function parseVectorXML(xmlStr){
+  var parser=new DOMParser();
+  var doc=parser.parseFromString(xmlStr,'application/xml');
+  var rows=doc.querySelectorAll('Row');
+  var entries=[];
+  var weekEnd='';
+  rows.forEach(function(row,i){
+    if(i===0)return; // header row
+    var cells=row.querySelectorAll('Data');
+    if(cells.length<3)return;
+    var rawName=cells[0].textContent.trim();
+    var rawDate=cells[1].textContent.trim();
+    var rawHrs=cells[2].textContent.trim();
+    if(!rawName||!rawDate||!rawHrs)return;
+    // Parse week end date
+    var datePart=rawDate.split(' ')[0]; // "03/22/2026"
+    var dp=datePart.split('/');
+    var isoDate=dp[2]+'-'+dp[0]+'-'+dp[1]; // "2026-03-22"
+    if(!weekEnd)weekEnd=isoDate;
+    var firstName=flipName(rawName);
+    var hrs=hmsToDecimal(rawHrs);
+    // Find matching employee
+    var emp=db.employees.find(function(e){
+      return e.name.toLowerCase()===firstName.toLowerCase();
+    });
+    entries.push({rawName:rawName,firstName:firstName,date:isoDate,hrs:hrs,emp:emp||null});
+  });
+
+  // Add default-hours employees not in the file
+  db.employees.forEach(function(e){
+    if(e.defaultHours&&e.defaultHours>0){
+      var alreadyIn=entries.find(function(en){return en.emp&&en.emp.id===e.id;});
+      if(!alreadyIn){
+        entries.push({rawName:e.name,firstName:e.name,date:weekEnd,hrs:e.defaultHours,emp:e,isDefault:true});
+      }
+    }
+  });
+
+  uploadData={entries:entries,weekEnd:weekEnd};
+  renderUploadPreview(entries,weekEnd);
+}
+
+function renderUploadPreview(entries,weekEnd){
+  var matched=entries.filter(function(e){return e.emp;});
+  var unmatched=entries.filter(function(e){return !e.emp;});
+  var preview=document.getElementById('uploadPreview');
+  var actions=document.getElementById('uploadActions');
+  preview.style.display='block';
+  actions.style.display='block';
+
+  var html='<div class="al al-b" style="margin-bottom:12px">📅 Week ending: <strong>'+fmtDate(weekEnd)+'</strong> · '+matched.length+' matched · '+unmatched.length+' unmatched</div>';
+
+  if(matched.length){
+    html+='<div class="card" style="margin-bottom:12px"><div class="ctitle" style="margin-bottom:10px">✅ Will Be Processed ('+matched.length+')</div><div class="twrap"><table><thead><tr><th>Employee</th><th>Hours</th><th>PTO Accrual</th><th>Note</th></tr></thead><tbody>';
+    matched.forEach(function(en){
+      var acc=(en.hrs*db.ptoRate).toFixed(2);
+      html+='<tr><td style="font-weight:600">'+en.emp.name+'</td><td class="mono">'+en.hrs.toFixed(2)+'</td>'+
+        '<td><span class="badge bg">+'+acc+'h</span></td>'+
+        '<td style="color:var(--muted);font-size:11px">'+(en.isDefault?'Default weekly hours':'From timesheet')+'</td></tr>';
+    });
+    html+='</tbody></table></div></div>';
+  }
+
+  if(unmatched.length){
+    html+='<div class="card"><div class="ctitle" style="margin-bottom:10px">⚠️ No Match Found ('+unmatched.length+') — Will Be Skipped</div><div class="twrap"><table><thead><tr><th>VectorVMS Name</th><th>Matched As</th><th>Hours</th></tr></thead><tbody>';
+    unmatched.forEach(function(en){
+      html+='<tr><td style="color:var(--muted)">'+en.rawName+'</td><td><span class="badge by">No match</span></td><td class="mono">'+en.hrs.toFixed(2)+'</td></tr>';
+    });
+    html+='</tbody></table><p class="hint" style="margin-top:8px">These names were not found in your employee list. Make sure names match exactly — add missing employees first then re-upload.</p></div></div>';
+  }
+
+  preview.innerHTML=html;
+}
+
+document.getElementById('confirm-upload').addEventListener('click',function(){
+  if(!uploadData)return;
+  var processed=0;
+  uploadData.entries.forEach(function(en){
+    if(!en.emp)return;
+    var emp=db.employees.find(function(e){return e.id===en.emp.id;});
+    if(!emp)return;
+    var hrs=en.hrs;
+    var acc=parseFloat((hrs*db.ptoRate).toFixed(2));
+    emp.hoursWorked=parseFloat(((emp.hoursWorked||0)+hrs).toFixed(2));
+    emp.ptoBalance=parseFloat((emp.ptoBalance+acc).toFixed(2));
+    if(!emp.weeklyHours)emp.weeklyHours=[];
+    emp.weeklyHours.push({id:Date.now()+Math.random(),weekEnd:uploadData.weekEnd,hours:hrs,accrued:acc});
+    emp.weeklyHours.sort(function(a,b){return new Date(b.weekEnd)-new Date(a.weekEnd);});
+    emp.requests=emp.requests||[];
+    emp.requests.push({id:Date.now()+Math.random(),type:'Accrual',hours:acc,
+      date:fmtDate(uploadData.weekEnd),note:'Week ending '+fmtDate(uploadData.weekEnd)+': '+hrs.toFixed(2)+' hrs worked'+(en.isDefault?' (default)':''),status:'Accrued'});
+    processed++;
+  });
+  save();refreshAdmin();
+  uploadData=null;
+  document.getElementById('uploadPreview').style.display='none';
+  document.getElementById('uploadActions').style.display='none';
+  document.getElementById('xmlFileIn').value='';
+  alert('✅ Processed '+processed+' employees successfully!');
+});
+
+// ===== MANUAL HOURS =====
+document.getElementById('manEmp').addEventListener('change',renderWeekLog);
+document.getElementById('manHrs').addEventListener('input',previewManual);
+document.getElementById('manWeekEnd').addEventListener('input',previewManual);
+
+function previewManual(){
+  var hrs=parseFloat(document.getElementById('manHrs').value);
+  var wk=document.getElementById('manWeekEnd').value;
+  var empId=parseInt(document.getElementById('manEmp').value);
+  var prev=document.getElementById('manPreview');
+  var dup=document.getElementById('manDupWarn');
+  if(hrs>0&&wk){
+    prev.style.display='block';
+    prev.textContent='✅ Week ending '+fmtDate(wk)+': '+hrs+' hrs → accrues '+(hrs*db.ptoRate).toFixed(2)+' hrs PTO';
+    if(empId){
+      var emp=db.employees.find(function(e){return e.id===empId;});
+      var isDup=emp&&(emp.weeklyHours||[]).some(function(w){return w.weekEnd===wk;});
+      dup.style.display=isDup?'block':'none';
+      if(isDup)dup.textContent='⚠️ Hours for this week have already been logged for this employee.';
+    }
+  } else {prev.style.display='none';dup.style.display='none';}
+}
+
+document.getElementById('log-manual').addEventListener('click',function(){
+  var empId=parseInt(document.getElementById('manEmp').value);
+  var hrs=parseFloat(document.getElementById('manHrs').value);
+  var wk=document.getElementById('manWeekEnd').value;
+  if(!empId||!hrs||hrs<=0||!wk){alert('Please select an employee, enter hours, and select a week ending date.');return;}
+  var emp=db.employees.find(function(e){return e.id===empId;});
+  var acc=parseFloat((hrs*db.ptoRate).toFixed(2));
+  emp.hoursWorked=parseFloat(((emp.hoursWorked||0)+hrs).toFixed(2));
+  emp.ptoBalance=parseFloat((emp.ptoBalance+acc).toFixed(2));
+  if(!emp.weeklyHours)emp.weeklyHours=[];
+  emp.weeklyHours.push({id:Date.now(),weekEnd:wk,hours:hrs,accrued:acc});
+  emp.weeklyHours.sort(function(a,b){return new Date(b.weekEnd)-new Date(a.weekEnd);});
+  emp.requests=emp.requests||[];
+  emp.requests.push({id:Date.now()+1,type:'Accrual',hours:acc,date:fmtDate(wk),
+    note:'Week ending '+fmtDate(wk)+': '+hrs+' hrs worked',status:'Accrued'});
+  save();refreshAdmin();
+  document.getElementById('manHrs').value='';
+  document.getElementById('manWeekEnd').value='';
+  document.getElementById('manPreview').style.display='none';
+  document.getElementById('manDupWarn').style.display='none';
+  renderWeekLog();
+  alert('✅ Week ending '+fmtDate(wk)+': logged '+hrs+'h, accrued '+acc+'h PTO for '+emp.name);
+});
+
+function renderWeekLog(){
+  var empId=parseInt(document.getElementById('manEmp').value);
+  var nameEl=document.getElementById('weekLogName');
+  var logEl=document.getElementById('weekLog');
+  if(!empId){nameEl.textContent='Select employee above';logEl.innerHTML='<div class="empty">Select an employee to view their weekly hours log.</div>';return;}
+  var emp=db.employees.find(function(e){return e.id===empId;});
+  if(!emp)return;
+  nameEl.textContent=emp.name;
+  var weeks=emp.weeklyHours||[];
+  if(!weeks.length){logEl.innerHTML='<div class="empty">No hours logged yet.</div>';return;}
+  var totHrs=weeks.reduce(function(s,w){return s+w.hours;},0);
+  var totAcc=weeks.reduce(function(s,w){return s+w.accrued;},0);
+  logEl.innerHTML='<div class="twrap"><table><thead><tr><th>Week Ending</th><th>Hours Worked</th><th>PTO Accrued</th><th></th></tr></thead><tbody>'+
+    weeks.map(function(w){
+      return '<tr><td style="font-weight:600">'+fmtDate(w.weekEnd)+'</td>'+
+        '<td class="mono">'+w.hours.toFixed(2)+'</td>'+
+        '<td><span class="badge bg">+'+w.accrued.toFixed(2)+'h</span></td>'+
+        '<td><button class="btn btn-d btn-sm" onclick="delWeek('+emp.id+','+w.id+')">Delete</button></td></tr>';
+    }).join('')+
+    '</tbody><tfoot><tr>'+
+    '<td style="padding:10px 12px">TOTAL ('+weeks.length+' weeks)</td>'+
+    '<td style="padding:10px 12px" class="mono">'+totHrs.toFixed(1)+'</td>'+
+    '<td style="padding:10px 12px"><span class="badge bb">+'+totAcc.toFixed(2)+'h</span></td>'+
+    '<td></td></tr></tfoot></table></div>';
+}
+
+window.delWeek=function(empId,entryId){
+  if(!confirm('Delete this week entry? This will reverse the hours and PTO accrual.'))return;
+  var emp=db.employees.find(function(e){return e.id===empId;});
+  var entry=(emp.weeklyHours||[]).find(function(w){return w.id===entryId;});
+  if(!entry)return;
+  emp.hoursWorked=parseFloat(Math.max(0,(emp.hoursWorked||0)-entry.hours).toFixed(2));
+  emp.ptoBalance=parseFloat((emp.ptoBalance-entry.accrued).toFixed(2));
+  emp.weeklyHours=emp.weeklyHours.filter(function(w){return w.id!==entryId;});
+  save();refreshAdmin();renderWeekLog();
+};
+
+// ===== LOG PTO =====
+document.getElementById('log-pto').addEventListener('click',function(){
+  var empId=parseInt(document.getElementById('ptoEmp').value);
+  var hrs=parseFloat(document.getElementById('ptoHrs').value);
+  var dt=document.getElementById('ptoDt').value;
+  var status=document.getElementById('ptoStat').value;
+  var note=document.getElementById('ptoNote').value.trim()||'Admin adjustment';
+  if(!empId||!hrs||!dt){alert('Please fill in all required fields.');return;}
+  var emp=db.employees.find(function(e){return e.id===empId;});
+  if(status==='Approved'&&hrs>emp.ptoBalance){alert('Insufficient balance.');return;}
+  if(status==='Approved')emp.ptoBalance=parseFloat((emp.ptoBalance-hrs).toFixed(2));
+  emp.requests=emp.requests||[];
+  emp.requests.push({id:Date.now(),type:'PTO Used',hours:-hrs,date:fmtDate(dt),note:note,status:status});
+  save();refreshAdmin();
+  alert('✅ PTO logged for '+emp.name+' — '+status);
+});
+
+function renderAdminPend(){
+  var list=document.getElementById('adminPendList');
+  var all=[];
+  db.employees.forEach(function(e){
+    (e.requests||[]).filter(function(r){return r.status==='Pending';}).forEach(function(r){
+      all.push(Object.assign({},r,{empName:e.name,empId:e.id}));
+    });
+  });
+  list.innerHTML=all.length?all.map(function(r){
+    return '<div class="hi pend" style="margin-bottom:8px">'+
+      '<div><div class="hm">🏖️ '+r.empName+' — '+Math.abs(r.hours).toFixed(2)+'h</div>'+
+      '<div class="hs">'+r.date+' · '+r.note+'</div></div>'+
+      '<div style="display:flex;gap:6px">'+
+      '<button class="btn btn-ok btn-sm" onclick="updateReqStatus('+r.empId+','+r.id+',\'Approved\')">Approve</button>'+
+      '<button class="btn btn-d btn-sm" onclick="updateReqStatus('+r.empId+','+r.id+',\'Denied\')">Deny</button>'+
+      '</div></div>';
+  }).join(''):'<div class="empty">No pending requests.</div>';
+}
+
+window.updateReqStatus=function(empId,reqId,status){
+  var emp=db.employees.find(function(e){return e.id===empId;});
+  var req=(emp.requests||[]).find(function(r){return r.id===reqId;});
+  if(!req)return;
+  if(status==='Approved'){
+    var hrs=Math.abs(req.hours);
+    if(hrs>emp.ptoBalance){alert('Insufficient balance.');return;}
+    emp.ptoBalance=parseFloat((emp.ptoBalance-hrs).toFixed(2));
+  }
+  req.status=status;
+  save();renderAdminPend();refreshAdmin();
+};
+
+// ===== ROLLOVER =====
+document.getElementById('proc-rollover').addEventListener('click',function(){
+  var empId=parseInt(document.getElementById('rollEmp').value);
+  if(!empId){alert('Please select an employee.');return;}
+  var emp=db.employees.find(function(e){return e.id===empId;});
+  var CAP=72;
+  var cur=emp.ptoBalance;
+  var forfeited=Math.max(0,cur-CAP);
+  emp.ptoBalance=parseFloat(Math.min(cur,CAP).toFixed(2));
+  emp.requests=emp.requests||[];
+  emp.requests.push({id:Date.now(),type:'Rollover',hours:forfeited>0?-forfeited:0,
+    date:new Date().toLocaleDateString(),
+    note:'Annual rollover. Balance capped at 72h. '+(forfeited>0?forfeited.toFixed(2)+'h forfeited.':'No hours forfeited.'),
+    status:'Processed'});
+  save();refreshAdmin();
+  var msg=document.getElementById('rollMsg');
+  msg.style.display='block';msg.className='al al-g';
+  msg.textContent='✅ Rollover for '+emp.name+': '+cur.toFixed(2)+'h → '+emp.ptoBalance.toFixed(2)+'h. '+(forfeited>0?forfeited.toFixed(2)+'h forfeited.':'No hours forfeited.');
+});
+
+function renderUpcoming(){
+  var div=document.getElementById('upcomingRoll');
+  if(!db.employees.length){div.innerHTML='<div class="empty">No employees yet.</div>';return;}
+  var sorted=db.employees.filter(function(e){return e.anniversaryDate;}).map(function(e){
+    return {emp:e,next:nextAnniv(e.anniversaryDate)};
+  }).sort(function(a,b){return new Date(a.next)-new Date(b.next);});
+  div.innerHTML=sorted.map(function(x){
+    var days=Math.ceil((new Date(x.next)-new Date())/86400000);
+    var cls=days<=14?'bo':days<=30?'by':'bb';
+    var over=x.emp.ptoBalance>72;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">'+
+      '<div><div style="font-weight:600;font-size:14px">'+x.emp.name+'</div>'+
+      '<div style="font-size:12px;color:var(--muted)">Balance: '+x.emp.ptoBalance.toFixed(2)+'h'+
+      (over?' <span style="color:var(--red)">(' +(x.emp.ptoBalance-72).toFixed(2)+'h will be forfeited)</span>':'')+'</div></div>'+
+      '<span class="badge '+cls+'">'+fmtDate(x.next)+' · '+days+'d</span></div>';
+  }).join('')||'<div class="empty">No anniversary dates set.</div>';
+}
+
+// ===== SETTINGS =====
+document.getElementById('update-rate').addEventListener('click',function(){
+  var rate=parseFloat(document.getElementById('rateIn').value);
+  if(isNaN(rate)||rate<=0){alert('Invalid rate.');return;}
+  db.ptoRate=rate;save();refreshAdmin();
+  var msg=document.getElementById('rateMsg');msg.style.display='block';
+  msg.className='al al-g';msg.textContent='✅ Rate updated to '+rate;
+});
+
+document.getElementById('reset-pw').addEventListener('click',function(){
+  var empId=parseInt(document.getElementById('pwEmp').value);
+  var pw=document.getElementById('pwNew').value;
+  var msg=document.getElementById('pwResetMsg');msg.style.display='block';
+  if(!empId||!pw){msg.className='al al-r';msg.textContent='Please select an employee and enter a password.';return;}
+  db.employees.find(function(e){return e.id===empId;}).password=pw;
+  save();document.getElementById('pwNew').value='';
+  msg.className='al al-g';msg.textContent='✅ Password reset successfully.';
+});
+
+document.getElementById('change-admin-pw').addEventListener('click',function(){
+  var np=document.getElementById('adminNewPw').value;
+  var cp=document.getElementById('adminConfPw').value;
+  var msg=document.getElementById('adminPwMsg');msg.style.display='block';
+  if(!np||np!==cp){msg.className='al al-r';msg.textContent=np?'Passwords do not match.':'Please enter a password.';return;}
+  db.adminPassword=np;save();
+  document.getElementById('adminNewPw').value='';document.getElementById('adminConfPw').value='';
+  msg.className='al al-g';msg.textContent='✅ Admin password updated.';
+});
+
+document.getElementById('export-csv').addEventListener('click',function(){
+  if(!db.employees.length){alert('No data to export.');return;}
+  var csv='Name,Anniversary Date,Default Hours,Hours Worked,PTO Balance,Total Requests\n';
+  db.employees.forEach(function(e){
+    csv+='"'+e.name+'",'+(e.anniversaryDate||'')+','+(e.defaultHours||'')+','+
+      (e.hoursWorked||0).toFixed(2)+','+e.ptoBalance.toFixed(2)+','+(e.requests||[]).length+'\n';
+  });
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='SITS_PTO_'+new Date().toLocaleDateString().replace(/\//g,'-')+'.csv';
+  a.click();
+});
+
+document.getElementById('clear-data').addEventListener('click',function(){
+  if(!confirm('Delete ALL data? This cannot be undone.'))return;
+  if(!confirm('Are you absolutely sure?'))return;
+  db.employees=[];save();refreshAdmin();
+});
+
+// ===== UTILS =====
+function nextAnniv(dateStr){
+  var orig=new Date(dateStr+'T12:00:00');
+  var now=new Date();
+  var next=new Date(orig);
+  next.setFullYear(now.getFullYear());
+  if(next<=now)next.setFullYear(now.getFullYear()+1);
+  return next.toISOString().split('T')[0];
+}
+
+function fmtDate(str){
+  if(!str)return '';
+  try{return new Date(str+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+  catch(e){return str;}
+}
+
+function hiHTML(r){
+  var isAcc=r.type==='Accrual';
+  var isRoll=r.type==='Rollover';
+  var cls=isAcc?'acc':isRoll?'roll':r.status==='Approved'?'used':r.status==='Pending'?'pend':'deny';
+  var label=isAcc?'✅ PTO Accrued':isRoll?'🔄 Annual Rollover':'🏖️ '+(r.type==='PTO Used'?'PTO Used':'PTO Request')+' — '+r.status;
+  var sign=(isAcc||isRoll)?'+':'-';
+  var hcls=(isAcc||isRoll)?'pos':r.status==='Denied'?'neu':'neg';
+  return '<div class="hi '+cls+'">'+
+    '<div><div class="hm">'+label+'</div><div class="hs">'+r.date+(r.note?' · '+r.note:'')+'</div></div>'+
+    '<div class="hh '+hcls+'">'+sign+Math.abs(r.hours).toFixed(2)+'h</div></div>';
+}
+
+refreshAdmin();
+})();
+</script>
+</body>
+</html>
